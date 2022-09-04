@@ -19,17 +19,34 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 //templating engine set up
-// app.engine('handlebars', express_handlebars( {extname: '.handlebars' }));
 app.set('view engine', 'handlebars');
 app.engine('handlebars', express_handlebars.engine({
   defaultLayout: 'main',
   extname: '.handlebars'
 }));
 
-//router
-app.get('', (req, res) => {
-  res.render('home')
+//connection pool
+const pool = mysql.createPool({
+  connectionLimit : 100,
+  port: 8080,
+  host : process.env.DB_HOST,
+  user : process.env.DB_USER,
+  password : process.env.DB_PASS,
+  database : process.env.DB_NAME
 });
 
+//connect to db
+pool.getConnection((err, connection) => {
+  if(err) throw err; 
+  console.log('Connected as ID' + connection.threadId);
+});
+
+// //router
+// app.get('', (req, res) => {
+//   res.render('home')
+// });
+
+const routes = require('./server/routes/user');
+app.use('/', routes);
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
