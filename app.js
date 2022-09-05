@@ -20,7 +20,11 @@ app.engine(
   })
 );
 
+//router 
 const routes = require("./server/routes/user");
-app.use("/", routes);
+app.use('/', routes);
+
+const router = require('./server/routes/user')
+app.use('/', router)
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

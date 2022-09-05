@@ -1,32 +1,42 @@
 // const { redirect } = require("express/lib/response");
-// const mysql2 = require("mysql2");
-// const app = require('express')();
+const mysql2 = require("mysql2");
+const app = require('express')();
 // //const router = require("../routes/user");
 
-// // //connection 
-// // const connection = mysql2.createConnection({
-// //   connectionLimit : 100,
-// //   port: 8080,
-// //   host : process.env.DB_HOST,
-// //   user : process.env.DB_USER,
-// //   password : process.env.DB_PASS,
-// //   database : process.env.DB_NAME
-// // });
+//connection
+const pool = mysql2.createPool({
+  connectionLimit: 100,
+  port: 8080,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+});
 
-// const userController = app.get('/', (req, res) => {
-//   res.send(req.params)
-// });
+//router
+app.get('/',(req, res) => {
+  res.render('home', {});
+});
 
+//view users
+exports.view = (req, res) => {
+ 
+pool.getConnection((err, connection) => {
+  if(err) throw err;
+  console.log('Connected as ID' + connection.threadId);
 
-// //connection
-// const pool = mysql2.createPool({
-//   connectionLimit: 100,
-//   port: 8080,
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASS,
-//   database: process.env.DB_NAME,
-// });
+  connection.query('SELECT * FROM user ORDER BY id DESC', (err, rows) => {
+    connection.release();
+
+    if(!err) {
+      res.render('home', { rows });
+    } else {
+      console.log(err);
+    }
+    console.log('The data from user table \n', rows)
+  });
+});
+};
 
 // //getting list of users
 
@@ -419,5 +429,5 @@
 //     });
 //   };
 // }
-//   module.exports = pool;
+  module.exports = pool;
 //   module.exports = userController;

@@ -1,11 +1,15 @@
 const express = require('express');
 const app = express()
-// const userController = require('../controllers/userController');
-// const pool = require('../controllers/userController')
+const userController = require('../controllers/userController');
+const pool = require('../controllers/userController')
 const router = express.Router();
+const mysql2 = require("mysql2");
 
-//render home page 
-app.get('/',(req, res) => {
+//crud
+
+//view 
+
+router.get('/', function (req, res) {
   res.render('home', {});
 });
 
@@ -18,6 +22,45 @@ app.get('/add-user', (req, res) => {
 app.get('/edit-user', (req, res) => {
   res.render('edit-user', {});
 });
+
+//render user data
+
+router.get('/', (req, res) => {
+  let sql = `SELECT * FROM user ORDER BY id DESC`;
+  pool.query(sql, (err, data) => {
+    if (err) throw err;
+    res.render('home',  {});
+  });
+});
+
+
+// new mysql2.ConnectionPool(config).connect().then(pool => {
+//   return pool.query `SELECT * FROM user ORDER BY id DESC`
+// }).then(result => {
+
+//   res.render('home', {
+//       rows: result.recordset
+//   });
+
+// }).catch(err => {
+//   console.log(err);
+// });
+
+
+// router.get("/", (req, res) => {
+//   let query = `SELECT * FROM user ORDER BY id DESC`;
+
+//   pool.query(query, (err, data) => {
+//     if(err) {
+//       throw error
+//     }
+//     else {
+//       res.render('home', {title: 'user', action:'list', sampleData:data})
+//     }
+//   });
+
+// });
+
 
 // app.get('', (req, res) => {
 //   pool.getConnection((err, connection) => {
@@ -63,3 +106,4 @@ app.get('/edit-user', (req, res) => {
 //    userController.update()});
 
 module.exports = app;
+module.exports = router;
